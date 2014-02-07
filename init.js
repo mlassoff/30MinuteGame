@@ -59,7 +59,7 @@ function handleBatLoad()
             }
     });
     
-    bmpAnimation = new creatjs.BitmapAnimation(spriteSheet);
+    bmpAnimation = new createjs.Sprite(spriteSheet);
     
     bmpAnimation.gotoAndPlay("flap");
     
@@ -70,22 +70,35 @@ function handleBatLoad()
     bmpAnimation.y = 32;
     bmpAnimation.currentFrame = 0;
     stage.addChild(bmpAnimation);
+    stage.update();
 }
 
+function handleBatError(e)
+{
+    alert("Error " + e);
+}
 
 function queueLoaded(event)
 {
     createjs.Sound.registerSound("assets/shot.mp3", "shot");
     createjs.Sound.registerSound("assets/countryside.mp3", "background");
-    context.drawImage(queue.getResult("backgroundImage"),0,0);    
+    var backgroundImage = new createjs.Bitmap(queue.getResult("backgroundImage"),0,0)
+    stage.addChild(backgroundImage);
+    stage.update();
+    //context.drawImage(queue.getResult("backgroundImage"),0,0);    
     var backgroundSound = createjs.Sound.play("background");
     
 }
 
 function handleMouseMove(event)
 {
-    context.drawImage(queue.getResult("backgroundImage"),0,0);    
-    context.drawImage(queue.getResult("crossHair"), event.clientX-45, event.clientY-45);   
+    var backgroundImage = new createjs.Bitmap(queue.getResult("backgroundImage"));
+    var crossHair = new createjs.Bitmap(queue.getResult("crossHair"));
+    stage.addChild(backgroundImage);
+    crossHair.x = event.clientX-45;
+    crossHair.y = event.clientY-45;
+    stage.addChild(crossHair);
+    stage.update();
 }
 
 function handleMouseDown(event)
