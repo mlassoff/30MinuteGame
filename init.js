@@ -53,22 +53,24 @@ window.onload = function()
 function handleBatLoad()
 {
     var spriteSheet = new createjs.SpriteSheet({
-            "images": [batImage],
-            "frames": {"width": 170, "height": 142},
-            "animations": { "flap": [0,5] }
+            images: [batImage],
+            frames: {width: 170, height: 142, count: 5},
+            animations: { flap: [0,5, "flap"] }
     });
     
-    animation = new createjs.Sprite(spriteSheet, "flap");
+    animation = new createjs.Sprite(spriteSheet);
     animation.gotoAndPlay("flap");
+    animation.name = "flyingBat"
     animation.x = 100;
     animation.y = 100;
-    spriteSheet.getAnimation("flap").frequency = 2;
-    spriteSheet.getAnimation("flap").next = "flap";
-    animation.gotoAndPlay("flap");
+    animation.vX =4;
+    animation.direction =90;
+    
+    animation.currentFrame =0;
     stage.addChild(animation);
-    Ticker.setFPS(60);
-    Ticker.addListener(stage);
-    stage.update();
+    createjs.Ticker.addListener(window);
+    createjs.Ticker.useRAF = true;
+    createjs.Ticker.setFPS(60);
 }
 
 function handleBatError(e)
@@ -81,20 +83,25 @@ function queueLoaded(event)
     createjs.Sound.registerSound("assets/shot.mp3", "shot");
     createjs.Sound.registerSound("assets/countryside.mp3", "background");
     var backgroundImage = new createjs.Bitmap(queue.getResult("backgroundImage"),0,0)
-    stage.addChild(backgroundImage);
+  //  stage.addChild(backgroundImage);
     stage.update();
     var backgroundSound = createjs.Sound.play("background");
     
+}
+
+function tick()
+{
+    stage.update();
 }
 
 function handleMouseMove(event)
 {
     var backgroundImage = new createjs.Bitmap(queue.getResult("backgroundImage"));
     var crossHair = new createjs.Bitmap(queue.getResult("crossHair"));
-    stage.addChild(backgroundImage);
+  //  stage.addChild(backgroundImage);
     crossHair.x = event.clientX-45;
     crossHair.y = event.clientY-45;
-    stage.addChild(crossHair);
+   // stage.addChild(crossHair);
     stage.addChild(animation);
     stage.update();
 }
