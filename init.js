@@ -6,6 +6,7 @@ var mouseXPosition;
 var mouseYPosition;
 var batImage;
 var stage;
+var animation;
 
 window.onload = function()
 {
@@ -52,24 +53,21 @@ window.onload = function()
 function handleBatLoad()
 {
     var spriteSheet = new createjs.SpriteSheet({
-            images: [batImage],
-            frame: {width: 64, height: 64, regX: 32, regY: 32},
-            animations: {
-                    flap: [0,9, "flap"]
-            }
+            "images": [batImage],
+            "frames": {"width": 170, "height": 142},
+            "animations": { "flap": [0,5] }
     });
     
-    bmpAnimation = new createjs.Sprite(spriteSheet);
-    
-    bmpAnimation.gotoAndPlay("flap");
-    
-    bmpAnimation.name="bat1";
-    bmpAnimation.direction = 90;
-    bmpAnimation.vx =4;
-    bmpAnimation.x = 16;
-    bmpAnimation.y = 32;
-    bmpAnimation.currentFrame = 0;
-    stage.addChild(bmpAnimation);
+    animation = new createjs.Sprite(spriteSheet, "flap");
+    animation.gotoAndPlay("flap");
+    animation.x = 100;
+    animation.y = 100;
+    spriteSheet.getAnimation("flap").frequency = 2;
+    spriteSheet.getAnimation("flap").next = "flap";
+    animation.gotoAndPlay("flap");
+    stage.addChild(animation);
+    Ticker.setFPS(60);
+    Ticker.addListener(stage);
     stage.update();
 }
 
@@ -85,7 +83,6 @@ function queueLoaded(event)
     var backgroundImage = new createjs.Bitmap(queue.getResult("backgroundImage"),0,0)
     stage.addChild(backgroundImage);
     stage.update();
-    //context.drawImage(queue.getResult("backgroundImage"),0,0);    
     var backgroundSound = createjs.Sound.play("background");
     
 }
@@ -98,6 +95,7 @@ function handleMouseMove(event)
     crossHair.x = event.clientX-45;
     crossHair.y = event.clientY-45;
     stage.addChild(crossHair);
+    stage.addChild(animation);
     stage.update();
 }
 
