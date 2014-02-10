@@ -7,11 +7,14 @@ var mouseYPosition;
 var batImage;
 var stage;
 var animation;
+var deathAnimation;
+var spriteSheet;
 var enemyXPos=100;
 var enemyYPos=100;
 var enemyXSpeed = 1.5;
 var enemyYSpeed = 1.75;
 var score = 0;
+var scoreText;
 
 window.onload = function()
 {
@@ -39,7 +42,9 @@ window.onload = function()
         {id: 'crossHair', src: 'assets/crosshair.png'},
         {id: 'shot', src: 'assets/shot.mp3'},
         {id: 'background', src: 'assets/countryside.mp3'},
+        {id: 'deathSound', src: 'assets/die.mp3'},
         {id: 'batSpritesheet', src: 'assets/batSpritesheet.png'},
+        {id: 'batDeath', src: 'assets/batDeath.png'},
     ]);
     queue.load();
 }
@@ -50,24 +55,30 @@ function queueLoaded(event)
     var backgroundImage = new createjs.Bitmap(queue.getResult("backgroundImage"))
     stage.addChild(backgroundImage);
 
+    //Add Score
+    scoreText = new createjs.Text("1UP: " + score.toString(), "36px Arial", "#FFF");
+    scoreText.x = 10;
+    scoreText.y = 10;
+    stage.addChild(scoreText);
+
     // Play background sound
     createjs.Sound.play("background", {loop: -1});
 
     // Create bat spritesheet
-    var spriteSheet = new createjs.SpriteSheet({
+    spriteSheet = new createjs.SpriteSheet({
         "images": [queue.getResult('batSpritesheet')],
         "frames": {"width": 198, "height": 117},
         "animations": { "flap": [0,4] }
     });
 
+    batDeathSpriteSheet = new createjs.SpriteSheet({
+    	"images": [queue.getResult('batDeath')],
+    	"frames": {"width": 198, "height" : 148},
+    	"animations": {"die": [0,7, false,1 ] }
+    });
+
     // Create bat sprite
-    animation = new createjs.Sprite(spriteSheet, "flap");
-    animation.regX = 99;
-    animation.regY = 58;
-    animation.x = enemyXPos;
-    animation.y = enemyYPos;
-    animation.gotoAndPlay("flap");
-    stage.addChild(animation);
+    createEnemy();
 
     // Create crosshair
     crossHair = new createjs.Bitmap(queue.getResult("crossHair"));
@@ -83,10 +94,31 @@ function queueLoaded(event)
     window.onmousedown = handleMouseDown;
 }
 
+function createEnemy()
+{
+	animation = new createjs.Sprite(spriteSheet, "flap");
+    animation.regX = 99;
+    animation.regY = 58;
+    animation.x = enemyXPos;
+    animation.y = enemyYPos;
+    animation.gotoAndPlay("flap");
+    stage.addChild(animation);
+}
+
+function batDeath()
+{
+	deathAnimation = new createjs.Sprite(batDeathSpriteSheet, "die");
+	deathAnimation.regX = 99;
+    deathAnimation.regY = 58;
+    deathAnimation.x = enemyXPos;
+    deathAnimation.y = enemyYPos;
+    deathAnimation.gotoAndPlay("die");
+    stage.addChild(deathAnimation);
+}
+
 function tickEvent()
 {
 	//Move enemy Bat
-	
 	if(enemyXPos < WIDTH && enemyXPos > 0)
 	{
 		enemyXPos += enemyXSpeed;
@@ -120,7 +152,8 @@ function handleMouseMove(event)
 
 function handleMouseDown(event)
 {
-    //Play Gunshot sound
+    
+   //Play Gunshot sound
     createjs.Sound.play("shot");
 
     //Increase speed of enemy slightly
@@ -151,14 +184,25 @@ function handleMouseDown(event)
 
     	if(hitFlagY && hitFlagX)
     	{
-    		console.log("Hit");
-    		//Enemy Dies
+    		//Hit
+    		stage.removeChild(animation);
+    		batDeath();
     		score += 100;
-    		
+    		scoreText.text = "1UP: " + score.toString();
+    		 createjs.Sound.play("deathSound");
+    		//Make it harder next time
+    		enemyYSpeed *= 1.5;
+    		enemyXSpeed *= 1.5;
+    		//Create new enemy
+    		var timeToCreate = Math.floor((Math.random()*3500)+1);
+			setTimeout(createEnemy,timeToCreate);
+
     	} else
     	{
-    		console.log("Miss");
+    		//Miss
     		score -= 10;
+    		scoreText.text = "1UP: " + score.toString();
+    		
     	}
 
     
