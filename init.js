@@ -15,6 +15,9 @@ var enemyXSpeed = 1.5;
 var enemyYSpeed = 1.75;
 var score = 0;
 var scoreText;
+var gameTimer;
+var gameTime = 0;
+var timerText;
 
 window.onload = function()
 {
@@ -42,11 +45,15 @@ window.onload = function()
         {id: 'crossHair', src: 'assets/crosshair.png'},
         {id: 'shot', src: 'assets/shot.mp3'},
         {id: 'background', src: 'assets/countryside.mp3'},
+        {id: 'gameOverSound', src: 'assets/gameOver.mp3'},
         {id: 'deathSound', src: 'assets/die.mp3'},
         {id: 'batSpritesheet', src: 'assets/batSpritesheet.png'},
         {id: 'batDeath', src: 'assets/batDeath.png'},
     ]);
     queue.load();
+
+    gameTimer = setInterval(updateTime, 1000);
+
 }
 
 function queueLoaded(event)
@@ -61,6 +68,12 @@ function queueLoaded(event)
     scoreText.y = 10;
     stage.addChild(scoreText);
 
+    //Ad Timer
+    timerText = new createjs.Text("Time: " + gameTime.toString(), "36px Arial", "#FFF");
+    timerText.x = 800;
+    timerText.y = 10;
+    stage.addChild(timerText);
+
     // Play background sound
     createjs.Sound.play("background", {loop: -1});
 
@@ -71,6 +84,7 @@ function queueLoaded(event)
         "animations": { "flap": [0,4] }
     });
 
+    // Create bat death spritesheet
     batDeathSpriteSheet = new createjs.SpriteSheet({
     	"images": [queue.getResult('batDeath')],
     	"frames": {"width": 198, "height" : 148},
@@ -157,8 +171,8 @@ function handleMouseDown(event)
     createjs.Sound.play("shot");
 
     //Increase speed of enemy slightly
-    enemyXSpeed += .25;
-    enemyYSpeed += .25;
+    enemyXSpeed *= 1.05;
+    enemyYSpeed *= 1.06;
 
     //Shot position
     var shotX = Math.round(event.clientX);
@@ -189,10 +203,11 @@ function handleMouseDown(event)
     		batDeath();
     		score += 100;
     		scoreText.text = "1UP: " + score.toString();
-    		 createjs.Sound.play("deathSound");
+    		createjs.Sound.play("deathSound");
     		//Make it harder next time
-    		enemyYSpeed *= 1.5;
-    		enemyXSpeed *= 1.5;
+    		enemyYSpeed *= 1.25;
+    		enemyXSpeed *= 1.3;
+
     		//Create new enemy
     		var timeToCreate = Math.floor((Math.random()*3500)+1);
 			setTimeout(createEnemy,timeToCreate);
@@ -207,4 +222,24 @@ function handleMouseDown(event)
 
     
 
+}
+
+function updateTime()
+{
+	gameTime += 1;
+	if(gameTime > 60)
+	{
+		//End Game and Clean up
+		timerText.text = "GAME OVER";
+		stage.removeChild(animation);
+		stage.removeChild(crossHair);
+		var si =createjs.Sound.play("gameOverSound");
+		clearInterval(gameTimer);
+		
+
+	}
+	else
+	{
+		timerText.text = "Time: " + gameTime
+	}
 }
