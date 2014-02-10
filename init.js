@@ -40,18 +40,27 @@ window.onload = function()
     queue.on("complete", queueLoaded, this);
     createjs.Sound.alternateExtensions = ["ogg"];
 
+    /*
+     *      Create a load manifest for all assets
+     *
+     */
     queue.loadManifest([
         {id: 'backgroundImage', src: 'assets/background.png'},
         {id: 'crossHair', src: 'assets/crosshair.png'},
         {id: 'shot', src: 'assets/shot.mp3'},
         {id: 'background', src: 'assets/countryside.mp3'},
         {id: 'gameOverSound', src: 'assets/gameOver.mp3'},
+        {id: 'tick', src: 'assets/tick.mp3'},
         {id: 'deathSound', src: 'assets/die.mp3'},
         {id: 'batSpritesheet', src: 'assets/batSpritesheet.png'},
         {id: 'batDeath', src: 'assets/batDeath.png'},
     ]);
     queue.load();
 
+    /*
+     *      Create a timer that updates once per second
+     *
+     */
     gameTimer = setInterval(updateTime, 1000);
 
 }
@@ -122,17 +131,17 @@ function createEnemy()
 function batDeath()
 {
 	deathAnimation = new createjs.Sprite(batDeathSpriteSheet, "die");
-	deathAnimation.regX = 99;
-    deathAnimation.regY = 58;
-    deathAnimation.x = enemyXPos;
-    deathAnimation.y = enemyYPos;
-    deathAnimation.gotoAndPlay("die");
-    stage.addChild(deathAnimation);
+  deathAnimation.regX = 99;
+  deathAnimation.regY = 58;
+  deathAnimation.x = enemyXPos;
+  deathAnimation.y = enemyYPos;
+  deathAnimation.gotoAndPlay("die");
+  stage.addChild(deathAnimation);
 }
 
 function tickEvent()
 {
-	//Move enemy Bat
+	//Make sure enemy bat is within game boundaries and move enemy Bat
 	if(enemyXPos < WIDTH && enemyXPos > 0)
 	{
 		enemyXPos += enemyXSpeed;
@@ -153,13 +162,13 @@ function tickEvent()
 	animation.x = enemyXPos;
 	animation.y = enemyYPos;
 
-	//console.log ("X: " + animation.x + " Y: " + animation.y + "Xs: " + enemyXSpeed + " Ys: " + enemyYSpeed);
-
+	
 }
 
 
 function handleMouseMove(event)
 {
+    //Offset the position by 45 pixels so mouse is in center of crosshair
     crossHair.x = event.clientX-45;
     crossHair.y = event.clientY-45;
 }
@@ -174,14 +183,13 @@ function handleMouseDown(event)
     enemyXSpeed *= 1.05;
     enemyYSpeed *= 1.06;
 
-    //Shot position
+    //Obtain Shot position
     var shotX = Math.round(event.clientX);
     var shotY = Math.round(event.clientY);
     var hitFlagX = false;
     var hitFlagY = false;
 
-    //console.log(shotX + " " + shotY + " Enemy: " + animation.x + " " + animation.y);
-
+    //If shot came within 40 pixels on the X and Y set hit flag to true
     for(var x = -20; x < 21; x++)
     {
     	if(shotX + x == Math.round(animation.x))
@@ -204,7 +212,8 @@ function handleMouseDown(event)
     		score += 100;
     		scoreText.text = "1UP: " + score.toString();
     		createjs.Sound.play("deathSound");
-    		//Make it harder next time
+    		
+        //Make it harder next time
     		enemyYSpeed *= 1.25;
     		enemyXSpeed *= 1.3;
 
@@ -236,5 +245,6 @@ function updateTime()
 	else
 	{
 		timerText.text = "Time: " + gameTime
+    createjs.Sound.play("tick");
 	}
 }
