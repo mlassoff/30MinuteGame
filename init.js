@@ -101,7 +101,7 @@ function queueLoaded(event)
     // Add ticker
     createjs.Ticker.setFPS(15);
     createjs.Ticker.addEventListener('tick', stage);
-    createjs.Ticker.addEventListener('tick', tickEvent)
+    createjs.Ticker.addEventListener('tick', tickEvent);
 
     // Set up events AFTER the game is loaded
     window.onmousemove = handleMouseMove;
@@ -116,7 +116,7 @@ function createEnemy()
     animation.x = enemyXPos;
     animation.y = enemyYPos;
     animation.gotoAndPlay("flap");
-    stage.addChild(animation);
+    stage.addChildAt(animation,1);
 }
 
 function batDeath()
@@ -210,7 +210,7 @@ function handleMouseDown(event)
 
     		//Create new enemy
     		var timeToCreate = Math.floor((Math.random()*3500)+1);
-			setTimeout(createEnemy,timeToCreate);
+			  setTimeout(createEnemy,timeToCreate);
 
     	} else
     	{
@@ -219,9 +219,6 @@ function handleMouseDown(event)
     		scoreText.text = "1UP: " + score.toString();
     		
     	}
-
-    
-
 }
 
 function updateTime()
@@ -235,8 +232,6 @@ function updateTime()
 		stage.removeChild(crossHair);
 		var si =createjs.Sound.play("gameOverSound");
 		clearInterval(gameTimer);
-		
-
 	}
 	else
 	{
