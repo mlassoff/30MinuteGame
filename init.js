@@ -186,48 +186,38 @@ function handleMouseDown(event)
     //Obtain Shot position
     var shotX = Math.round(event.clientX);
     var shotY = Math.round(event.clientY);
-    var hitFlagX = false;
-    var hitFlagY = false;
+    var spriteX = Math.round(animation.x);
+    var spriteY = Math.round(animation.y);
 
-    //If shot came within 40 pixels on the X and Y set hit flag to true
-    for(var x = -20; x < 21; x++)
+    // Compute the X and Y distance using absolte value
+    var distX = Math.abs(shotX - spriteX);
+    var distY = Math.abs(shotY - spriteY);
+
+    // Anywhere in the body or head is a hit - but not the wings
+    if(distX < 30 && distY < 59 )
     {
-    	if(shotX + x == Math.round(animation.x))
-    	{
-    		hitFlagX = true;
-    	}
+    	//Hit
+    	stage.removeChild(animation);
+    	batDeath();
+    	score += 100;
+    	scoreText.text = "1UP: " + score.toString();
+    	createjs.Sound.play("deathSound");
+    	
+        //Make it harder next time
+    	enemyYSpeed *= 1.25;
+    	enemyXSpeed *= 1.3;
 
-    	if(shotY + x == Math.round(animation.y))
-    	{
-    		hitFlagY = true;
-    	}
+    	//Create new enemy
+    	var timeToCreate = Math.floor((Math.random()*3500)+1);
+	    setTimeout(createEnemy,timeToCreate);
+
+    } else
+    {
+    	//Miss
+    	score -= 10;
+    	scoreText.text = "1UP: " + score.toString();
 
     }
-
-    	if(hitFlagY && hitFlagX)
-    	{
-    		//Hit
-    		stage.removeChild(animation);
-    		batDeath();
-    		score += 100;
-    		scoreText.text = "1UP: " + score.toString();
-    		createjs.Sound.play("deathSound");
-    		
-        //Make it harder next time
-    		enemyYSpeed *= 1.25;
-    		enemyXSpeed *= 1.3;
-
-    		//Create new enemy
-    		var timeToCreate = Math.floor((Math.random()*3500)+1);
-			  setTimeout(createEnemy,timeToCreate);
-
-    	} else
-    	{
-    		//Miss
-    		score -= 10;
-    		scoreText.text = "1UP: " + score.toString();
-    		
-    	}
 }
 
 function updateTime()
