@@ -103,9 +103,13 @@ function queueLoaded(event)
     // Create bat sprite
     createEnemy();
 
+   /*
     // Create crosshair
     crossHair = new createjs.Bitmap(queue.getResult("crossHair"));
+    crossHair.x = WIDTH/2;
+    crossHair.y = HEIGHT/2;
     stage.addChild(crossHair);
+    */
 
     // Add ticker
     createjs.Ticker.setFPS(15);
@@ -113,7 +117,7 @@ function queueLoaded(event)
     createjs.Ticker.addEventListener('tick', tickEvent);
 
     // Set up events AFTER the game is loaded
-    window.onmousemove = handleMouseMove;
+   // window.onmousemove = handleMouseMove;
     window.onmousedown = handleMouseDown;
 }
 
@@ -130,7 +134,7 @@ function createEnemy()
 
 function batDeath()
 {
-	deathAnimation = new createjs.Sprite(batDeathSpriteSheet, "die");
+  deathAnimation = new createjs.Sprite(batDeathSpriteSheet, "die");
   deathAnimation.regX = 99;
   deathAnimation.regY = 58;
   deathAnimation.x = enemyXPos;
@@ -165,18 +169,26 @@ function tickEvent()
 	
 }
 
-
+/*
 function handleMouseMove(event)
 {
     //Offset the position by 45 pixels so mouse is in center of crosshair
     crossHair.x = event.clientX-45;
     crossHair.y = event.clientY-45;
 }
+*/
 
 function handleMouseDown(event)
 {
     
-   //Play Gunshot sound
+    //Display CrossHair
+    crossHair = new createjs.Bitmap(queue.getResult("crossHair"));
+    crossHair.x = event.clientX-45;
+    crossHair.y = event.clientY-45;
+    stage.addChild(crossHair);
+    createjs.Tween.get(crossHair).to({alpha: 0},1000);
+    
+    //Play Gunshot sound
     createjs.Sound.play("shot");
 
     //Increase speed of enemy slightly
@@ -229,7 +241,8 @@ function updateTime()
 		timerText.text = "GAME OVER";
 		stage.removeChild(animation);
 		stage.removeChild(crossHair);
-		var si =createjs.Sound.play("gameOverSound");
+        createjs.Sound.removeSound("background");
+        var si =createjs.Sound.play("gameOverSound");
 		clearInterval(gameTimer);
 	}
 	else
