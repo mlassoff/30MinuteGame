@@ -1,4 +1,4 @@
-30MinuteGame
+o30MinuteGame
 ============
 
 30 Minutes to Your First Game from ByteArray.
