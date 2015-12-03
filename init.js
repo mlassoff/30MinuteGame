@@ -18,6 +18,7 @@ var scoreText;
 var gameTimer;
 var gameTime = 0;
 var timerText;
+var gameFinished = false; // created a new global var to check if game is finished or not
 
 window.onload = function()
 {
@@ -180,56 +181,58 @@ function handleMouseMove(event)
 
 function handleMouseDown(event)
 {
-    
-    //Display CrossHair
-    crossHair = new createjs.Bitmap(queue.getResult("crossHair"));
-    crossHair.x = event.clientX-45;
-    crossHair.y = event.clientY-45;
-    stage.addChild(crossHair);
-    createjs.Tween.get(crossHair).to({alpha: 0},1000);
-    
-    //Play Gunshot sound
-    createjs.Sound.play("shot");
+    // This will only work if the game is not finished
+    if(!gameFinished) { 
+        //Display CrossHair
+        crossHair = new createjs.Bitmap(queue.getResult("crossHair"));
+        crossHair.x = event.clientX-45;
+        crossHair.y = event.clientY-45;
+        stage.addChild(crossHair);
+        createjs.Tween.get(crossHair).to({alpha: 0},1000);
+        
+        //Play Gunshot sound
+        createjs.Sound.play("shot");
 
-    //Increase speed of enemy slightly
-    enemyXSpeed *= 1.05;
-    enemyYSpeed *= 1.06;
+        //Increase speed of enemy slightly
+        enemyXSpeed *= 1.05;
+        enemyYSpeed *= 1.06;
 
-    //Obtain Shot position
-    var shotX = Math.round(event.clientX);
-    var shotY = Math.round(event.clientY);
-    var spriteX = Math.round(animation.x);
-    var spriteY = Math.round(animation.y);
+        //Obtain Shot position
+        var shotX = Math.round(event.clientX);
+        var shotY = Math.round(event.clientY);
+        var spriteX = Math.round(animation.x);
+        var spriteY = Math.round(animation.y);
 
-    // Compute the X and Y distance using absolte value
-    var distX = Math.abs(shotX - spriteX);
-    var distY = Math.abs(shotY - spriteY);
+        // Compute the X and Y distance using absolte value
+        var distX = Math.abs(shotX - spriteX);
+        var distY = Math.abs(shotY - spriteY);
 
-    // Anywhere in the body or head is a hit - but not the wings
-    if(distX < 30 && distY < 59 )
-    {
-    	//Hit
-    	stage.removeChild(animation);
-    	batDeath();
-    	score += 100;
-    	scoreText.text = "1UP: " + score.toString();
-    	createjs.Sound.play("deathSound");
-    	
-        //Make it harder next time
-    	enemyYSpeed *= 1.25;
-    	enemyXSpeed *= 1.3;
+        // Anywhere in the body or head is a hit - but not the wings
+          if(distX < 30 && distY < 59 )
+        {
+        	//Hit
+        	stage.removeChild(animation);
+        	batDeath();
+        	score += 100;
+        	scoreText.text = "1UP: " + score.toString();
+        	createjs.Sound.play("deathSound");
+        	
+            //Make it harder next time
+        	enemyYSpeed *= 1.25;
+        	enemyXSpeed *= 1.3;
 
-    	//Create new enemy
-    	var timeToCreate = Math.floor((Math.random()*3500)+1);
-	    setTimeout(createEnemy,timeToCreate);
+        	//Create new enemy
+        	var timeToCreate = Math.floor((Math.random()*3500)+1);
+    	    setTimeout(createEnemy,timeToCreate);
 
-    } else
-    {
-    	//Miss
-    	score -= 10;
-    	scoreText.text = "1UP: " + score.toString();
+        } else
+        {
+        	//Miss
+        	score -= 10;
+        	scoreText.text = "1UP: " + score.toString();
 
-    }
+        }
+    } 
 }
 
 function updateTime()
@@ -244,10 +247,11 @@ function updateTime()
         createjs.Sound.removeSound("background");
         var si =createjs.Sound.play("gameOverSound");
 		clearInterval(gameTimer);
+        gameFinished = true; // game has finished
 	}
 	else
 	{
 		timerText.text = "Time: " + gameTime
-    createjs.Sound.play("tick");
+        createjs.Sound.play("tick");
 	}
 }
